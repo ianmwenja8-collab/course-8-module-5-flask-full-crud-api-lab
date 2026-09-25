@@ -2,53 +2,80 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Simulated data
 class Event:
     def __init__(self, id, title):
         self.id = id
         self.title = title
 
     def to_dict(self):
-        return {"id": self.id, "title": self.title}
+        return {
+            "id": self.id,
+            "title": self.title
+        }
 
-# In-memory "database"
 events = [
     Event(1, "Tech Meetup"),
     Event(2, "Python Workshop")
 ]
 
-# TODO: Task 1 - Define the Problem
-# Create a new event from JSON input
-@app.route("/events", methods=["POST"])
+@app.route('/events', methods=['POST'])
 def create_event():
-    # TODO: Task 2 - Design and Develop the Code
+    data = request.get_json()
 
-    # TODO: Task 3 - Implement the Loop and Process Each Element
+    if not data or "title" not in data:
+        return jsonify({
+            "error": "Event title is required."
+        }), 400
 
-    # TODO: Task 4 - Return and Handle Results
-    pass
+    new_event = Event(
+        len(events) + 1,
+        data["title"]
+    )
 
-# TODO: Task 1 - Define the Problem
-# Update the title of an existing event
-@app.route("/events/<int:event_id>", methods=["PATCH"])
-def update_event(event_id):
-    # TODO: Task 2 - Design and Develop the Code
+    events.append(new_event)
 
-    # TODO: Task 3 - Implement the Loop and Process Each Element
+    return jsonify({
+        "message": "Event created successfully.",
+        "event": new_event.to_dict()
+    }), 201
 
-    # TODO: Task 4 - Return and Handle Results
-    pass
+@app.route('/events/<int:id>', methods=['PATCH'])
+def update_event(id):
+    data = request.get_json()
 
-# TODO: Task 1 - Define the Problem
-# Remove an event from the list
-@app.route("/events/<int:event_id>", methods=["DELETE"])
-def delete_event(event_id):
-    # TODO: Task 2 - Design and Develop the Code
+    if not data or "title" not in data:
+        return jsonify({
+            "error": "New event title is required."
+        }), 400
 
-    # TODO: Task 3 - Implement the Loop and Process Each Element
+    for event in events:
+        if event.id == id:
+            event.title = data["title"]
 
-    # TODO: Task 4 - Return and Handle Results
-    pass
+            return jsonify({
+                "message": "Event updated successfully.",
+                "event": event.to_dict()
+            }), 200
+
+    return jsonify({
+        "error": "Event not found."
+    }), 404
+
+@app.route('/events/<int:id>', methods=['DELETE'])
+def delete_event(id):
+
+    for event in events:
+        if event.id == id:
+            events.remove(event)
+
+            return jsonify({
+                "message": "Event deleted successfully."
+            }), 200
+
+    return jsonify({
+        "error": "Event not found."
+    }), 404
+
 
 if __name__ == "__main__":
     app.run(debug=True)
