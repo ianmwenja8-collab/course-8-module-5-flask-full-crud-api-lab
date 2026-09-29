@@ -34,11 +34,8 @@ def create_event():
 
     events.append(new_event)
 
-    return jsonify({
-        "message": "Event created successfully.",
-        "event": new_event.to_dict()
-    }), 201
-
+    return jsonify(new_event.to_dict()), 201
+    
 @app.route('/events/<int:id>', methods=['PATCH'])
 def update_event(id):
     data = request.get_json()
@@ -52,10 +49,7 @@ def update_event(id):
         if event.id == id:
             event.title = data["title"]
 
-            return jsonify({
-                "message": "Event updated successfully.",
-                "event": event.to_dict()
-            }), 200
+            return jsonify(event.to_dict()), 200
 
     return jsonify({
         "error": "Event not found."
@@ -68,9 +62,7 @@ def delete_event(id):
         if event.id == id:
             events.remove(event)
 
-            return jsonify({
-                "message": "Event deleted successfully."
-            }), 200
+            return "", 204
 
     return jsonify({
         "error": "Event not found."
